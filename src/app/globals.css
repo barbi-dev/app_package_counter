@@ -34,9 +34,387 @@ a {
   color: inherit;
   text-decoration: none;
 }
+h1,h2 {
+  color: var(--text);
+  font-weight: 900;
+  font-size: medium;
+}
 
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
+  }
+}
+
+:root{
+  --bg: #ffd0e8;          /* blanco-rosado suave */
+  --card: #ffffff;        /* blanco */
+  --text: #370551;        /* morado oscuro para texto */
+  --muted: #2d0b4b;
+
+  --primary: #6d28d9;     /* morado */
+  --primary-2: #8b5cf6;   /* morado claro */
+  --accent: #f49ecd;      /* rosa pastel */
+  --accent-2: #ffd1ea;    /* rosa aún más suave */
+
+  --border: #40006b;
+  --danger: #e6345a;      /* rojo rosado */
+  --success: #45d078;     /* verde para ok */
+}
+
+html, body{
+  background: var(--bg);
+  color: var(--text);
+}
+
+*{
+  box-sizing: border-box;
+}
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.btn{
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnPrimary{
+  background: linear-gradient(90deg, var(--primary), var(--primary-2));
+  color: white;
+  border: none;
+}
+
+.btnAccent{
+  background: var(--accent);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn:disabled{
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.input{
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  outline: none;
+  font-size: 16px;
+  background: white;
+  color: var(--text);
+}
+.inputLarge {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 32px;  /* grande */
+  font-weight: 800;
+  background: white;
+  color: var(--text);
+  
+}
+
+.inputSmall {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 16px;  /* pequeño */
+  background: white;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.inputError{
+  border: 2px solid var(--danger);
+}
+
+.badgeOk{
+  color: var(--success);
+  font-weight: 800;
+}
+
+.badgeErr{
+  color: var(--danger);
+  font-weight: 800;
+}
+
+/* --- History/table UI --- */
+.toolbar{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.label{
+  font-weight: 800;
+  color: var(--text);
+}
+
+.tableWrap{
+  overflow: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px; /* solo aplica en desktop; en móvil ocultamos tabla */
+}
+
+.table th{
+  text-align: left;
+  padding: 12px;
+  background: #fff0f8; /* rosa muy suave */
+  color: var(--text);
+  font-weight: 300;
+  border-bottom: 1px solid var(--border);
+}
+
+.table td{
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.table tr:hover td{
+  background: #fff7fb;
+}
+
+.kpiGrid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.kpi{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.kpiTitle{
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.kpiValue{
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.chips{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.chip{
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: white;
+  font-size: 14px;
+}
+
+.cardList{
+  display: none;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.logCard{
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.logRow{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.logKey{
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.logVal{
+  font-weight: 300;
+  text-align: right;
+}
+
+@media (max-width: 720px){
+  .kpiGrid{
+    grid-template-columns: 1fr;
+  }
+  .tableWrap{
+    display: none; /* ocultamos tabla */
+  }
+  .cardList{
+    display: flex; /* mostramos cards */
+  }
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(14%) sepia(65%) saturate(1700%) hue-rotate(250deg) brightness(90%) contrast(95%);
+  cursor: pointer;
+}
+
+/* --- Summary (capturable) --- */
+.summaryGridCard{
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.summaryGridHeader{
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr 80px;
+  gap: 10px;
+  padding: 10px 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #fff0f8;
+  border-radius: 14px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.summaryCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  border: 2px solid #7c4dff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.summaryCode {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4a148c;
+}
+
+.summaryTotal {
+  font-size: 22px;
+  font-weight: 800;
+  background: #f3e5f5;
+  padding: 8px 14px;
+  border-radius: 12px;
+  color: #6a1b9a;
+}
+/* Modo captura: deja solo lo necesario */
+.captureMode .captureHide{
+  display: none !important;
+}
+
+.captureMode .pageWrap{
+  padding: 12px !important;
+  max-width: 980px;
+}
+
+.captureMode{
+  background: white !important;
+}
+
+/* ---------- Summary mobile polish ---------- */
+@media (max-width: 460px){
+  .pageWrap{
+    padding: 18px !important;
+  }
+
+  /* toolbar: se ordena mejor */
+  .toolbar{
+    gap: 8px;
+  }
+
+  /* inputs y botones un poco más compactos */
+  .btn{
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .inputSmall{
+    font-size: 14px;
+    padding: 10px 10px;
+    border-radius: 12px;
+  }
+
+  /* KPIs más bonitos en móvil */
+  .kpiGrid{
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .kpi{
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .kpiValue{
+    font-size: 30px;
+  }
+
+  /* Card del resumen */
+  .summaryGridCard{
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  /* Header de la tabla: más compacto */
+  .summaryGridHeader{
+    grid-template-columns: 1fr 64px 1fr 64px;
+    gap: 8px;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  /* La grilla principal: más usable */
+  .summaryGrid{
+    grid-template-columns: 1fr 64px 1fr 64px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .summaryCode,
+  .summaryTotal{
+    padding: 2px 10px;
+    border-radius: 14px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .summaryTotal{
+    font-size: 18px;
   }
 }
