@@ -451,3 +451,72 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+/* ===== Botones ===== */
+.btnSmall {
+  display: inline-flex;          /* evita que "desaparezca" por width/overflow raros */
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.15);
+  background: white;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+
+  white-space: nowrap;           /* que no se parta "Anular" */
+}
+
+.btnDanger {
+  background: #ff4d6d;           /* puedes cambiarlo a tu paleta */
+  border-color: rgba(0,0,0,.08);
+  color: #0b0b0f;
+}
+
+/* Badge para "Anulado" */
+.pillVoid {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+
+  background: rgba(0,0,0,.12);
+  border: 1px solid rgba(0,0,0,.15);
+}
+
+/* ===== Tabla responsive (esto suele ser la causa en móvil) ===== */
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;              /* permite ver la columna "Acción" */
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;              /* fuerza ancho mínimo para que no "corte" la última columna */
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Asegura que la columna Acción tenga espacio */
+.table th:last-child,
+.table td:last-child {
+  width: 120px;
+  text-align: right;
+}
+
+.logAction{
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}

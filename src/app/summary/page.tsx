@@ -56,6 +56,7 @@ export default function SummaryPage() {
         const { data, error } = await supabase
         .from("logs")
         .select("code")
+        .eq("is_void", false) 
         .gte("created_at", start.toISOString())
         .lt("created_at", end.toISOString());
 

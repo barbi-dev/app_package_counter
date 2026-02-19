@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState} from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 
@@ -11,6 +11,7 @@ type LogRow = {
   client_name: string;
   assigned_number: number;
   user_id: string | null;
+  is_void: boolean;
 };
 
 function pad2(n: number) {
@@ -32,12 +33,13 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const totalDay = logs.length;
+  const totalDay = logs.filter((r) => !r.is_void).length;
 
   // Totales por cliente en el día
-  const totalsByClient = useMemo(() => {
+    const totalsByClient = useMemo(() => {
     const m = new Map<string, number>();
     for (const row of logs) {
+      if (row.is_void) continue; 
       m.set(row.client_name, (m.get(row.client_name) ?? 0) + 1);
     }
     return Array.from(m.entries())
@@ -52,6 +54,45 @@ export default function HistoryPage() {
     return newest;
   }, [logs]);
 
+  // Fetch logs del día (trae anulados y no anulados)
+  const fetchLogsForSelectedDate = useCallback(async (dateStr: string) => {
+    const start = new Date(`${dateStr}T00:00:00`);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    const { data, error } = await supabase
+      .from("logs")
+      .select("id, created_at, code, client_name, assigned_number, user_id, is_void")
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString())
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return (data ?? []) as LogRow[];
+  }, []);
+
+  const handleVoid = async (id: number) => {
+    const ok = window.confirm(
+      "¿Anular este registro? No contará en los totales del día."
+    );
+    if (!ok) return;
+
+    const { error } = await supabase.rpc("void_log", { p_id: id });
+    if (error) {
+      alert("Error anulando: " + error.message);
+      return;
+    }
+
+    // refresca tabla/totales
+    try {
+      const rows = await fetchLogsForSelectedDate(selectedDate);
+      setLogs(rows);
+    } catch (e: unknown) {
+      console.error(e);
+      alert("Se anuló, pero no se pudo refrescar el historial.");
+    }
+  };
+
   useEffect(() => {
     const run = async () => {
       setLoading(true);
@@ -64,31 +105,20 @@ export default function HistoryPage() {
         return;
       }
 
-      // Rango del día [00:00, 00:00 del día siguiente)
-      const start = new Date(`${selectedDate}T00:00:00`);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 1);
-
-      const { data, error } = await supabase
-        .from("logs")
-        .select("id, created_at, code, client_name, assigned_number, user_id")
-        .gte("created_at", start.toISOString())
-        .lt("created_at", end.toISOString())
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error(error);
+      try {
+        const rows = await fetchLogsForSelectedDate(selectedDate);
+        setLogs(rows);
+      } catch (err) {
+        console.error(err);
         setErrorMsg("No se pudo cargar el historial para esa fecha.");
         setLogs([]);
-      } else {
-        setLogs((data ?? []) as LogRow[]);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     run();
-  }, [router, selectedDate]);
+  }, [router, selectedDate, fetchLogsForSelectedDate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -194,12 +224,14 @@ export default function HistoryPage() {
                   <th>Código</th>
                   <th>Cliente</th>
                   <th>Número asignado</th>
+                  <th>Acción</th>
                 </tr>
               </thead>
+
               <tbody>
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={4} style={{ padding: 16 }}>
+                    <td colSpan={5} style={{ padding: 16 }}>
                       No hay registros para esta fecha.
                     </td>
                   </tr>
@@ -210,6 +242,18 @@ export default function HistoryPage() {
                       <td>{log.code}</td>
                       <td style={{ fontWeight: 800 }}>{log.client_name}</td>
                       <td>{log.assigned_number}</td>
+                      <td>
+                        {log.is_void ? (
+                          <span className="pillVoid">Anulado</span>
+                        ) : (
+                          <button
+                            className="btnSmall btnDanger"
+                            onClick={() => handleVoid(log.id)}
+                          >
+                            Anular
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -243,6 +287,17 @@ export default function HistoryPage() {
                   <div className="logRow">
                     <div className="logKey">Número</div>
                     <div className="logVal">{log.assigned_number}</div>
+                  </div>
+
+                  <div className="logAction">
+                    
+                    {log.is_void ? (
+                      <span className="pillVoid">Anulado</span>
+                    ) : (
+                      <button className="btnSmall btnDanger" onClick={() => handleVoid(log.id)}>
+                        Anular
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
