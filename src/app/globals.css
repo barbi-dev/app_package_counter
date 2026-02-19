@@ -23,6 +23,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html, body{
+  overflow-x: hidden;
+}
 
 * {
   box-sizing: border-box;
@@ -287,6 +290,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 14px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .summaryGridHeader{
@@ -301,38 +307,55 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: var(--text);
 }
 
-.summaryGrid {
+/* --- Summary cards grid --- */
+.summaryGrid{
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-top: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* SIEMPRE 2 por fila */
+  gap: 12px;
+  width: 100%;
 }
 
-.summaryCard {
+/* Tarjeta: que no se salga */
+.summaryCard{
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
   background: white;
   border-radius: 16px;
-  padding: 16px;
+  padding: 14px;
   border: 2px solid #7c4dff;
+  box-shadow: 0 6px 16px rgba(124, 77, 255, 0.15);
+
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  overflow: hidden; /* evita que el contenido empuje */
 }
 
-.summaryCode {
+/* Código: que no rompa layout */
+.summaryCode{
+  min-width: 0;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 300;
   color: #4a148c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.summaryTotal {
-  font-size: 22px;
-  font-weight: 800;
+/* Total en “pill” */
+.summaryTotal{
+  flex: 0 0 auto;
+  font-size: 20px;
+  font-weight: 900;
   background: #f3e5f5;
-  padding: 8px 14px;
-  border-radius: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
   color: #6a1b9a;
 }
+
 /* Modo captura: deja solo lo necesario */
 .captureMode .captureHide{
   display: none !important;
@@ -387,23 +410,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   /* Card del resumen */
   .summaryGridCard{
-    padding: 12px;
+    padding: 8px;
     border-radius: 18px;
+    
+  }
+  .summaryCard{
+    text-align: left;
+    justify-content: left;
+    padding: 8px 24px;
+
   }
 
-  /* Header de la tabla: más compacto */
-  .summaryGridHeader{
-    grid-template-columns: 1fr 64px 1fr 64px;
-    gap: 8px;
-    padding: 10px;
-    font-size: 13px;
-  }
+
 
   /* La grilla principal: más usable */
   .summaryGrid{
-    grid-template-columns: 1fr 64px 1fr 64px;
-    gap: 8px;
-    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 tarjetas por fila */
+    gap: 12px;
+    padding: 12px 22px; 
   }
 
   .summaryCode,
@@ -412,9 +437,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 14px;
     font-size: 16px;
     line-height: 24px;
+    text-align: left;
   }
 
   .summaryTotal{
     font-size: 18px;
+    text-align: left;
+  }
+}
+
+@media (min-width: 640px){
+  .summaryGrid{
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
