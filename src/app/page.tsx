@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type RpcRow = {
   ok: boolean;
@@ -123,9 +124,6 @@ useEffect(() => {
   };
 }, []);
 
-  const msgClass =
-    status === "success" ? "badgeOk" : status === "error" ? "badgeErr" : "";
-
   const handleRegister = async () => {
     const trimmed = code.trim();
 
@@ -202,84 +200,217 @@ useEffect(() => {
     if (!lastLog) return "—";
     return new Date(lastLog.created_at).toLocaleTimeString();
   }, [lastLog]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div style={{ padding: 40, maxWidth: 900 }}>
-      <h1 style={{ marginBottom: 8 }}>Registrar paquete</h1>
-      <p style={{ marginTop: 0, color: "var(--muted)" }}>
-        Escribe el código y presiona <b>Enter</b> o “Registrar”.
-      </p>
+  <main className="appShell">
+    <div className="bgBlob bgBlob1" />
+    <div className="bgBlob bgBlob2" />
+    <div className="bgBlob bgBlob3" />
 
-      {/* Mini dashboard */}
-      <div className="card" style={{ marginTop: 14 }}>
-        <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
-          <div style={{ minWidth: 180 }}>
-            <div style={{ color: "var(--muted)" }}>Total hoy</div>
-            <div style={{ fontSize: 32, fontWeight: 900 }}>
-              {dashLoading ? "…" : totalToday}
-            </div>
-          </div>
+    <section className="registerSurface">
+      {!mobileMenuOpen && (
+        <button
+          type="button"
+          className="mobileMenuButton"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Abrir menú"
+        >
+          <span className="menuLine" />
+          <span className="menuLine" />
+          <span className="menuLine" />
+        </button>
+      )}
 
-          <div style={{ minWidth: 260 }}>
-            <div style={{ color: "var(--muted)" }}>Último cliente registrado</div>
-            <div style={{ fontSize: 18, fontWeight: 800 }}>
-              {dashLoading ? "…" : lastLog?.client_name ?? "—"}
-            </div>
-          </div>
-
-          <div style={{ minWidth: 180 }}>
-            <div style={{ color: "var(--muted)" }}>Hora del último registro</div>
-            <div style={{ fontSize: 18, fontWeight: 800 }}>
-              {dashLoading ? "…" : lastTime}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Registro */}
-      <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
-        <input
-          ref={inputRef}
-          className={`inputLarge ${status === "error" ? "inputError" : ""}`}
-          placeholder="Código"
-          value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-            if (status !== "idle") {
-              setStatus("idle");
-              setMessage("");
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleRegister();
-          }}
-          inputMode="numeric"
+      <>
+        <div
+          className={`mobileDrawerOverlay ${mobileMenuOpen ? "isOpen" : ""}`}
+          onClick={() => setMobileMenuOpen(false)}
         />
 
+        <aside className={`mobileDrawer ${mobileMenuOpen ? "isOpen" : ""}`}>
+          <div className="mobileDrawerClosediv">
+            <button
+              className="mobileDrawerClose"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Cerrar menú"
+            >
+              ×
+            </button>
+
+          </div>
+          <div className="mobileDrawerHeader">
+            <div className="mobileBrand">
+              <Image
+                src="/logo.png"
+                alt="GalexShop"
+                width={52}
+                height={52}
+                className="mobileLogo"
+                priority
+              />
+              <span className="mobileBrandName">GalexShop</span>
+            </div>
+
+          </div>
+
+          <nav className="mobileNav">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                router.push("/history");
+              }}
+              className="mobileNavItem"
+            >
+              Historial
+            </button>
+
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                router.push("/summary");
+              }}
+              className="mobileNavItem"
+            >
+              Resumen
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                router.push("/clients");
+              }}
+              className="mobileNavItem"
+            >
+              Nuevo Cliente
+            </button>
+
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleLogout();
+              }}
+              className="mobileNavItem mobileLogout"
+            >
+              Salir
+            </button>
+          </nav>
+        </aside>
+      </>
+      
+      
+
+      <section className="heroBlock">
+        <h1 className="heroTitle">Registrar paquete</h1>
+        <p className="heroText">
+          Escribe el código y presiona <strong>Enter</strong> o toca <strong>Registrar</strong>.
+        </p>
+      </section>
+
+      <section className="statsGrid">
+        <article className="statCard">
+          <span className="statLabel">Total hoy</span>
+          <strong className="statValue">
+            {dashLoading ? "…" : totalToday}
+          </strong>
+        </article>
+
+        <article className="statCard">
+          <span className="statLabel">Último cliente registrado</span>
+          <strong className="statValue statValueSm">
+            {dashLoading ? "…" : lastLog?.client_name ?? "—"}
+          </strong>
+        </article>
+
+        <article className="statCard">
+          <span className="statLabel">Hora del último registro</span>
+          <strong className="statValue statValueSm">
+            {dashLoading ? "…" : lastTime}
+          </strong>
+        </article>
+      </section>
+
+      <section className="registerPanel">
+        <div className="inputWrap">
+          <label className="inputLabel" htmlFor="package-code">
+            Código del cliente
+          </label>
+
+          <input
+            id="package-code"
+            ref={inputRef}
+            className={`proInput ${status === "error" ? "proInputError" : ""}`}
+            placeholder="Ej. 303"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value);
+              if (status !== "idle") {
+                setStatus("idle");
+                setMessage("");
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleRegister();
+            }}
+            inputMode="numeric"
+            autoComplete="off"
+          />
+        </div>
+
         <button
-          className="btn btnPrimary"
+          className="proPrimaryBtn"
           onClick={handleRegister}
           disabled={loading}
         >
-          {loading ? "Registrando..." : "Registrar"}
+          <span>{loading ? "Registrando..." : "Registrar"}</span>
         </button>
+      </section>
+
+      <div className="feedbackRow" aria-live="polite">
+        {message ? (
+          <div
+            className={`feedbackBadge ${
+              status === "success"
+                ? "feedbackSuccess"
+                : status === "error"
+                ? "feedbackError"
+                : ""
+            }`}
+          >
+            {message}
+          </div>
+        ) : (
+          <div className="feedbackPlaceholder" />
+        )}
       </div>
 
-      <div style={{ marginTop: 14, minHeight: 24 }}>
-        {message && <div className={msgClass}>{message}</div>}
-      </div>
-
-      <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
-        <button className="btn btnAccent" onClick={() => router.push("/history")}>
-          Ver historial
-        </button>
-        <button className="btn btnPrimary" onClick={() => router.push("/summary")}>
+      <section className="secondaryActions">
+        <button
+          className="secondaryBtn secondaryGradient"
+          onClick={() => router.push("/summary")}
+        >
           Resumen diario
         </button>
-        <button className="btn" onClick={handleLogout}>
+                <button
+          className="secondaryBtn secondaryGhost"
+          onClick={() => router.push("/history")}
+        >
+          Historial
+        </button>
+        <button
+          className="secondaryBtn secondaryGhost"
+          onClick={() => router.push("/clients")}
+        >
+          Nuevo Cliente
+        </button>
+
+
+
+
+        <button className="secondaryBtn secondaryLight" onClick={handleLogout}>
           Salir
         </button>
-      </div>
-    </div>
-  );
+      </section>
+    </section>
+  </main>
+);
 }
