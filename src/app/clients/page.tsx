@@ -79,7 +79,8 @@ export default function ClientsPage() {
     ]);
 
     if (error) {
-      setStatusMsg("Error al registrar cliente.");
+      console.error(error);
+      setStatusMsg(`Error al registrar cliente: ${error.message}`);
       return;
     }
 
